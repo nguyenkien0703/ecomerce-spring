@@ -1,7 +1,12 @@
 package com.ecommerce.shopapp.entity;
 
+import com.ecommerce.shopapp.component.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
 
 @Table(name = "users")
 @Entity
@@ -10,11 +15,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class user {
+public class User extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
 
     @Column(name = "fullname", length = 100)
@@ -33,4 +35,8 @@ public class user {
 
     @Column(name = "password", length = 200, nullable = false)
     private String password;
+
+    @Column(name = "role")
+    private String role;
+
 }
