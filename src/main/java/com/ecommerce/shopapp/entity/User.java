@@ -1,23 +1,32 @@
 package com.ecommerce.shopapp.entity;
 
-import com.ecommerce.shopapp.component.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
-@Table(name = "users")
 @Entity
+@Table(name = "users")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class User extends BaseEntity {
-
-
+/*
+ALTER TABLE users
+  MODIFY facebook_account_id VARCHAR(255),
+  MODIFY google_account_id VARCHAR(255);
+* */
+public class User extends BaseEntity implements UserDetails {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "fullname", length = 100)
     private String fullName;
@@ -32,11 +41,63 @@ public class User extends BaseEntity {
     @Column(name = "address", length = 200)
     private String address;
 
+    //ALTER TABLE users ADD COLUMN profile_image VARCHAR(255) DEFAULT '';
+    @Column(name = "profile_image", length = 255)
+    private String profileImage;
 
     @Column(name = "password", length = 200, nullable = false)
     private String password;
 
-    @Column(name = "role")
-    private String role;
+    @Column(name = "is_active")
+    private boolean active;
+
+    @Column(name = "date_of_birth")
+    private Date dateOfBirth;
+
+    @Column(name = "facebook_account_id")
+    private String facebookAccountId;
+
+    @Column(name = "google_account_id")
+    private String googleAccountId;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private com.ecommerce.shopapp.entity.Role role;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
+        authorityList.add(new SimpleGrantedAuthority("ROLE_" + getRole().getName()));
+        return authorityList;
+    }
+
+    @Override
+    public String getUsername() {
+        return phoneNumber;
+    }
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+
+
+
 
 }
+
