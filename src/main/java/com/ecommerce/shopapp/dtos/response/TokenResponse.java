@@ -1,8 +1,7 @@
-package com.ecommerce.shopapp.dto.response;
+package com.ecommerce.shopapp.dtos.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 
