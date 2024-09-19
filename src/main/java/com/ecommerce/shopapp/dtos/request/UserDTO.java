@@ -14,7 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserDTO  {
+public class UserDTO  extends SocialAccountDTO{
 
     @JsonProperty("fullname")
     private String fullName;
