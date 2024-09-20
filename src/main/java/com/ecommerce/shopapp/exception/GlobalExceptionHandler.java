@@ -1,6 +1,8 @@
 package com.ecommerce.shopapp.exception;
 
+import com.ecommerce.shopapp.responses.ResponseObject;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,28 +15,26 @@ import java.util.Date;
  * @author Admin
  * @created 9/16/2024
  */
-@RestControllerAdvice
+@RestControllerAdvice// Chỉ định lớp này xử lý ngoại lệ chung
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({ResourceNotFoundException.class, UsernameNotFoundException.class})
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleResourceNotFoundException(Exception e) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setTimestamp(new Date());
-        errorResponse.setStatus(HttpStatus.NOT_FOUND.value());
-        String message = e.getMessage();
-        errorResponse.setMessage(message);
-        return errorResponse;
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<ResponseObject> handleGeneralException(Exception exception) {
+        return ResponseEntity.internalServerError().body(
+                ResponseObject.builder()
+                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .message(exception.getMessage())
+                        .build()
+        );
     }
 
-    @ExceptionHandler({AuthorizationException.class, BadCredentialsException.class})
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErrorResponse handleAuthorizationException(Exception e) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setTimestamp(new Date());
-        errorResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
-        String message = e.getMessage();
-        errorResponse.setMessage(message);
-        return errorResponse;
+    @ExceptionHandler(DataNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<?> handleResourceNotFoundException(DataNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseObject.builder()
+                .status(HttpStatus.NOT_FOUND)
+                .message(exception.getMessage())
+                .build());
     }
 }
