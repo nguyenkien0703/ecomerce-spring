@@ -6,12 +6,15 @@ import com.ecommerce.shopapp.entity.Product;
 import com.ecommerce.shopapp.entity.ProductImage;
 import com.ecommerce.shopapp.responses.ProductResponse;
 import org.springframework.data.domain.*;
+
+import java.util.List;
+
 public interface IProductService {
     Product createProduct(ProductDTO productDTO) throws Exception;
     Product getProductById(long id) throws Exception;
     Page<ProductResponse> getAllProducts(
-//            String keyword,
-//                                         Long categoryId,
+            String keyword,
+                                         Long categoryId,
                                  PageRequest pageRequest);
     Product updateProduct(long id, ProductDTO productDTO) throws Exception;
     void deleteProduct(long id);
@@ -20,7 +23,9 @@ public interface IProductService {
             Long productId,
             ProductImageDTO productImageDTO) throws Exception;
 
-//    List<Product> findProductsByIds(List<Long> productIds);
+    List<Product> findProductsByIds(List<Long> productIds);
+
+
 //    //String storeFile(MultipartFile file) throws IOException; //chuyển sang FileUtils
 //    //void deleteFile(String filename) throws IOException;
 //

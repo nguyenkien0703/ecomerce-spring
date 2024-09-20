@@ -30,8 +30,7 @@ public class ProductDTO {
 
     private String description;
 
-    @JsonProperty("category_id")// duoi db la category_id, con o entity la categoryId, so to match you can
+    @JsonProperty("category_id")
     private Long categoryId;
-    private List<MultipartFile> files;
 
 }
