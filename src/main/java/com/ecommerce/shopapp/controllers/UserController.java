@@ -1,5 +1,6 @@
 package com.ecommerce.shopapp.controllers;
 
+import com.ecommerce.shopapp.dtos.request.RefreshTokenDTO;
 import com.ecommerce.shopapp.dtos.request.UserDTO;
 import com.ecommerce.shopapp.dtos.request.UserLoginDTO;
 import com.ecommerce.shopapp.entity.Token;
@@ -92,6 +93,30 @@ public class UserController {
         return ResponseEntity.ok().body(ResponseObject.builder().message("Login successfully").data(loginResponse).status(HttpStatus.OK).build());
 
     }
+
+    @PostMapping("/refreshToken")
+    public ResponseEntity<ResponseObject> refreshToken(
+            @Valid @RequestBody RefreshTokenDTO refreshTokenDTO
+    )throws Exception {
+        User userDetail = userService.getUserDetailsFromRefreshToken(refreshTokenDTO.getRefreshToken());
+        Token jwtToken= tokenService.refreshToken(refreshTokenDTO.getRefreshToken(), userDetail);
+        LoginResponse loginResponse=LoginResponse.builder()
+                .message("Refresh token successfully")
+                .token(jwtToken.getToken())
+                .tokenType(jwtToken.getTokenType())
+                .refreshToken(jwtToken.getRefreshToken())
+                .username(userDetail.getUsername())
+                .roles(userDetail.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
+                .id(userDetail.getId()).build();
+        return ResponseEntity.ok().body(
+                ResponseObject.builder()
+                        .data(loginResponse)
+                        .message(loginResponse.getMessage())
+                        .status(HttpStatus.OK)
+                        .build());
+    }
+
+
 
 
     private boolean isMobileDevice(String userAgent) {
