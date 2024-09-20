@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
@@ -56,7 +57,7 @@ public class OrderDTO {
 //    @JsonProperty("coupon_code")
 //    private String couponCode;
 
-//    @JsonProperty("cart_items")
-//    private List<CartItemDTO> cartItems;
+    @JsonProperty("cart_items")
+    private List<CartItemDTO> cartItems;
 
 }

@@ -3,6 +3,7 @@ package com.ecommerce.shopapp.services;
 import com.ecommerce.shopapp.dtos.request.OrderDTO;
 import com.ecommerce.shopapp.entity.Order;
 import com.ecommerce.shopapp.exception.DataNotFoundException;
+import com.ecommerce.shopapp.responses.OrderResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,7 +15,7 @@ public interface IOrderService {
     Order getOrderById(Long orderId);
     Order updateOrder(Long id, OrderDTO orderDTO) throws DataNotFoundException;
     void deleteOrder(Long orderId);
-    List<Order> findByUserId(Long userId);
+    List<OrderResponse> findByUserId(Long userId);
     Page<Order> getOrdersByKeyword(String keyword, Pageable pageable);
 
 
