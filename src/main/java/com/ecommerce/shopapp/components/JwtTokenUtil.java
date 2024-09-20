@@ -4,23 +4,20 @@ import com.ecommerce.shopapp.entity.Token;
 import com.ecommerce.shopapp.entity.User;
 import com.ecommerce.shopapp.exception.InvalidParamException;
 import com.ecommerce.shopapp.repositories.TokenRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.security.SecureRandom;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
-
-import io.jsonwebtoken.Jwts.*;
 
 
 @Component
@@ -101,7 +98,7 @@ public class JwtTokenUtil {
 
     // check expiration
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         Date expirationDate = this.extractClaim(token, Claims::getExpiration);
 
         return expirationDate.before(new Date());

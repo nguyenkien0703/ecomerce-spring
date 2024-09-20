@@ -1,25 +1,36 @@
 package com.ecommerce.shopapp.services.impl;
 
 import com.ecommerce.shopapp.components.JwtTokenUtil;
+import com.ecommerce.shopapp.dtos.request.UpdateUserDTO;
 import com.ecommerce.shopapp.dtos.request.UserDTO;
+import com.ecommerce.shopapp.dtos.request.UserLoginDTO;
 import com.ecommerce.shopapp.entity.Role;
 import com.ecommerce.shopapp.entity.User;
 import com.ecommerce.shopapp.exception.DataNotFoundException;
+import com.ecommerce.shopapp.exception.ExpiredTokenException;
+import com.ecommerce.shopapp.exception.InvalidPasswordException;
 import com.ecommerce.shopapp.exception.PermissionDenyException;
 import com.ecommerce.shopapp.repositories.RoleRepository;
 import com.ecommerce.shopapp.repositories.UserRepository;
 import com.ecommerce.shopapp.services.IUserService;
+import com.ecommerce.shopapp.utils.LocalizationUtils;
 import com.ecommerce.shopapp.utils.MessageKeys;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+
+import static com.ecommerce.shopapp.utils.ValidationUtils.isValidEmail;
 
 /**
  * @author Admin
@@ -34,6 +45,7 @@ public class UserService implements IUserService {
     private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final LocalizationUtils localizationUtils;
 
     @Override
     @Transactional
@@ -47,9 +59,9 @@ public class UserService implements IUserService {
         }
         Role role = roleRepository.findById(userDTO.getRoleId())
                 .orElseThrow(() -> new DataNotFoundException(
-//                        localizationUtils.getLocalizedMessage(
-                                MessageKeys.ROLE_DOES_NOT_EXISTS)
-//                )
+                                localizationUtils.getLocalizedMessage(
+                                        MessageKeys.ROLE_DOES_NOT_EXISTS)
+                        )
                 );
 
 
@@ -81,26 +93,115 @@ public class UserService implements IUserService {
 
 
     @Override
-    public String login(String phoneNumber, String password) throws Exception {
-        Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
+    public String login(UserLoginDTO userLoginDTO) throws Exception {
+        Optional<User> optionalUser = Optional.empty();
+        String subject = null;
+        Role roleUser = roleRepository.findByName(Role.USER)
+                .orElseThrow(() -> new DataNotFoundException(
+                        localizationUtils.getLocalizedMessage(MessageKeys.ROLE_DOES_NOT_EXISTS)));
+
+//        // Check by Google Account ID
+//        if(userLoginDTO.getGoogleAccountId()!= null && userLoginDTO.isGoogleAccountIdValid()) {
+//            optionalUser = userRepository.findByGoogleAccountId(userLoginDTO.getGoogleAccountId());
+//            subject = "Google:" + userLoginDTO.getGoogleAccountId();
+//            if(optionalUser.isEmpty()) {
+//                User newUser = User.builder()
+//                        .fullName(userLoginDTO.getFullname() != null ? userLoginDTO.getFullname() : "")
+//                        .email(userLoginDTO.getEmail() != null ? userLoginDTO.getEmail() : "")
+//                        .profileImage(userLoginDTO.getProfileImage() != null ? userLoginDTO.getProfileImage(): "")
+//                        .role(roleUser)
+//                        .googleAccountId(userLoginDTO.getGoogleAccountId())
+//                        .password("")
+//                        .active(true)
+//                        .build();
+//                // Lưu người dùng mới vào cơ sở dữ liệu
+//                newUser = userRepository.save(newUser);
+//
+//                // Optional trở thành có giá trị với người dùng mới
+//                optionalUser = Optional.of(newUser);
+//            }
+//            Map<String, Object> attributes = new HashMap<>();
+//            attributes.put("email", userLoginDTO.getEmail());
+//
+//        }
+
+        // Check if the user exists by phone number
+        if (userLoginDTO.getPhoneNumber() != null && !userLoginDTO.getPhoneNumber().isBlank()) {
+            optionalUser = userRepository.findByPhoneNumber(userLoginDTO.getPhoneNumber());
+            subject = userLoginDTO.getPhoneNumber();
+        }
+        // If the user is not found by phone number, check by email
+        if (optionalUser.isEmpty() && userLoginDTO.getEmail() != null && !userLoginDTO.getEmail().isBlank()) {
+            optionalUser = userRepository.findByEmail(userLoginDTO.getEmail());
+            subject = userLoginDTO.getEmail();
+        }
+        // If user is not found, throw an exception
         if (optionalUser.isEmpty()) {
-            throw new DataNotFoundException("invalid phone number or password");
+            throw new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.WRONG_PHONE_PASSWORD));
         }
+
         User existingUser = optionalUser.get();
-        // check password
-        if (existingUser.getFacebookAccountId().equals("0") && existingUser.getGoogleAccountId().equals("0")) {
-            if (!passwordEncoder.matches(password, existingUser.getPassword())) {
-                throw new BadCredentialsException("invalid password");
-            }
+
+        // Check if the user account is active
+        if (!existingUser.isActive()) {
+            throw new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.USER_IS_LOCKED));
         }
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                phoneNumber, password,
+
+        // Create authentication token using the found subject and granted authorities
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                subject,
+                userLoginDTO.isPasswordBlank() ? "" : userLoginDTO.getPassword(),
                 existingUser.getAuthorities()
         );
-
-        //authenticate with spring  security
-        authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        //authenticate with Java Spring security
+        authenticationManager.authenticate(authenticationToken);
         return jwtTokenUtil.generateToken(existingUser);
+    }
+
+    @Override
+    public User getUserDetailsFromToken(String token) throws Exception {
+        if (jwtTokenUtil.isTokenExpired(token)) {
+            throw new ExpiredTokenException("Token is expired");
+        }
+        String subject = jwtTokenUtil.getSubject(token);
+        Optional<User> user;
+        user = userRepository.findByPhoneNumber(subject);
+        if (user.isEmpty() && isValidEmail(subject)) {
+            user = userRepository.findByEmail(subject);
+        }
+        return user.orElseThrow(() -> new Exception("User not found"));
+    }
+
+    @Override
+    public User getUserDetailsFromRefreshToken(String refreshToken) throws Exception {
+        return null;
+    }
+
+    @Transactional
+    @Override
+    public User updateUser(Long userId, UpdateUserDTO updatedUserDTO) throws Exception {
+
+        return null;
+    }
+
+    @Override
+    public Page<User> findAll(String keyword, Pageable pageable) throws Exception {
+        return null;
+    }
+
+    @Override
+    public void resetPassword(Long userId, String newPassword) throws InvalidPasswordException, DataNotFoundException {
+
+    }
+
+    @Override
+    public void blockOrEnable(Long userId, Boolean active) throws DataNotFoundException {
+
+    }
+
+    @Override
+    public void changeProfileImage(Long userId, String imageName) throws Exception {
+
     }
 
 
