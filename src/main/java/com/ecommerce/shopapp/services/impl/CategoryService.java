@@ -2,10 +2,13 @@ package com.ecommerce.shopapp.services.impl;
 
 import com.ecommerce.shopapp.dtos.request.CategoryDTO;
 import com.ecommerce.shopapp.entity.Category;
+import com.ecommerce.shopapp.entity.Product;
 import com.ecommerce.shopapp.repositories.CategoryRepository;
+import com.ecommerce.shopapp.repositories.ProductRepository;
 import com.ecommerce.shopapp.services.ICategoryService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,9 +18,10 @@ import java.util.List;
 public class CategoryService implements ICategoryService {
 
     private final CategoryRepository categoryRepository;
-
+    private final ProductRepository productRepository;
 
     @Override
+    @Transactional
     public Category createCategory(CategoryDTO categoryDTO) {
         Category newCategory = Category.builder().
                 name(categoryDTO.getName()).build();
@@ -46,16 +50,16 @@ public class CategoryService implements ICategoryService {
 
     @Override
     @Transactional
-    public void deleteCategory(long id)  {
-//        Category category = categoryRepository.findById(id)
-//                .orElseThrow(() -> new ChangeSetPersister.NotFoundException());
-//
-//        List<Product> products = productRepository.findByCategory(category);
-//        if (!products.isEmpty()) {
-//            throw new IllegalStateException("Cannot delete category with associated products");
-//        } else {
+    public Category deleteCategory(long id) throws Exception  {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ChangeSetPersister.NotFoundException());
+
+        List<Product> products = productRepository.findByCategory(category);
+        if (!products.isEmpty()) {
+            throw new IllegalStateException("Cannot delete category with associated products");
+        } else {
             categoryRepository.deleteById(id);
-//            return  category;
-//        }
+            return  category;
+        }
     }
 }

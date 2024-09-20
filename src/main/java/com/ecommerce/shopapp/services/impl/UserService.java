@@ -5,12 +5,14 @@ import com.ecommerce.shopapp.dtos.request.UpdateUserDTO;
 import com.ecommerce.shopapp.dtos.request.UserDTO;
 import com.ecommerce.shopapp.dtos.request.UserLoginDTO;
 import com.ecommerce.shopapp.entity.Role;
+import com.ecommerce.shopapp.entity.Token;
 import com.ecommerce.shopapp.entity.User;
 import com.ecommerce.shopapp.exception.DataNotFoundException;
 import com.ecommerce.shopapp.exception.ExpiredTokenException;
 import com.ecommerce.shopapp.exception.InvalidPasswordException;
 import com.ecommerce.shopapp.exception.PermissionDenyException;
 import com.ecommerce.shopapp.repositories.RoleRepository;
+import com.ecommerce.shopapp.repositories.TokenRepository;
 import com.ecommerce.shopapp.repositories.UserRepository;
 import com.ecommerce.shopapp.services.IUserService;
 import com.ecommerce.shopapp.utils.LocalizationUtils;
@@ -27,6 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -41,6 +44,7 @@ import static com.ecommerce.shopapp.utils.ValidationUtils.isValidEmail;
 public class UserService implements IUserService {
 
     private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
     private final RoleRepository roleRepository;
     private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
@@ -180,28 +184,83 @@ public class UserService implements IUserService {
     @Transactional
     @Override
     public User updateUser(Long userId, UpdateUserDTO updatedUserDTO) throws Exception {
+        // Find the existing user by userId
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
+        // Update user information based on the DTO
+        if (updatedUserDTO.getFullName() != null) {
+            existingUser.setFullName(updatedUserDTO.getFullName());
+        }
+        if (updatedUserDTO.getAddress() != null) {
+            existingUser.setAddress(updatedUserDTO.getAddress());
+        }
+        if (updatedUserDTO.getDateOfBirth() != null) {
+            existingUser.setDateOfBirth(updatedUserDTO.getDateOfBirth());
+        }
+//        if (updatedUserDTO.isFacebookAccountIdValid()) {
+//            existingUser.setFacebookAccountId(updatedUserDTO.getFacebookAccountId());
+//        }
+//        if (updatedUserDTO.isGoogleAccountIdValid()) {
+//            existingUser.setGoogleAccountId(updatedUserDTO.getGoogleAccountId());
+//        }
 
-        return null;
+        // Update the password if it is provided in the DTO
+        if(updatedUserDTO.getPassword()!= null && !updatedUserDTO.getPassword().isBlank()){
+            if(!updatedUserDTO.getPassword().equals(updatedUserDTO.getRetypePassword())) {
+                throw new DataNotFoundException("Password and retype password not the same");
+
+            }
+            String newPassword = updatedUserDTO
+                    .getPassword();
+            String encodedPassword = passwordEncoder.encode(
+                    newPassword
+            );
+            existingUser.setPassword(encodedPassword);
+        }
+
+        //existingUser.setRole(updatedRole);
+        // Save the updated user
+
+        return userRepository.save(existingUser);
+
     }
 
     @Override
     public Page<User> findAll(String keyword, Pageable pageable) throws Exception {
-        return null;
+        return userRepository.findAll(keyword, pageable);
     }
 
     @Override
+    @Transactional
     public void resetPassword(Long userId, String newPassword) throws InvalidPasswordException, DataNotFoundException {
-
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("user not found"));
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        existingUser.setPassword(encodedPassword);
+        userRepository.save(existingUser);
+        //reset password => clear token
+        List<Token> tokens = tokenRepository.findByUser(existingUser);
+        for (Token token : tokens) {
+            tokenRepository.delete(token);
+        }
     }
 
     @Override
+    @Transactional
     public void blockOrEnable(Long userId, Boolean active) throws DataNotFoundException {
-
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
+        existingUser.setActive(active);
+        userRepository.save(existingUser);
     }
 
     @Override
+    @Transactional
     public void changeProfileImage(Long userId, String imageName) throws Exception {
-
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
+        existingUser.setProfileImage(imageName);
+        userRepository.save(existingUser);
     }
 
 

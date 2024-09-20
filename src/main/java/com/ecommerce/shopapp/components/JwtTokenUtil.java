@@ -38,7 +38,7 @@ public class JwtTokenUtil {
     private final TokenRepository tokenRepository;
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenUtil.class);
 
-    public String generateToken(User user ) throws InvalidParamException {
+    public String generateToken(User user) throws InvalidParamException {
         // properties => claims
         Map<String, Object> claims = new HashMap<>();
 
@@ -48,21 +48,16 @@ public class JwtTokenUtil {
         claims.put("subject", subject);
         // add user'id
         claims.put("userId", user.getId());
-        try{
-            String token = Jwts.builder()
-                    .setClaims(claims) //how to extract claims from this ?
-                    .setSubject(subject)
-                    .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000L))
-                    .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                    .compact();
+        try {
+            String token = Jwts.builder().setClaims(claims) //how to extract claims from this ?
+                    .setSubject(subject).setExpiration(new Date(System.currentTimeMillis() + expiration * 1000L)).signWith(getSignInKey(), SignatureAlgorithm.HS256).compact();
             return token;
 
-        }catch (Exception e){
-          //you can "inject" Logger, instead System.out.println
-            throw new InvalidParamException("Cannot create jwt token, error: "+e.getMessage());
+        } catch (Exception e) {
+            //you can "inject" Logger, instead System.out.println
+            throw new InvalidParamException("Cannot create jwt token, error: " + e.getMessage());
             //return null;
         }
-
 
 
     }
@@ -70,7 +65,7 @@ public class JwtTokenUtil {
     private static String getSubject(User user) {
         // determine subject identifier (phone number or email)
         String subject = user.getPhoneNumber();
-        if(subject == null || subject.isBlank()) {
+        if (subject == null || subject.isBlank()) {
             // if phone number is null or blank, use email as subject
             subject = user.getEmail();
         }
@@ -84,13 +79,11 @@ public class JwtTokenUtil {
 
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSignInKey())
-                .build()
-                .parseClaimsJws(token)
+        return Jwts.parserBuilder().setSigningKey(getSignInKey()).build().parseClaimsJws(token)
 
                 .getBody();
     }
+
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = this.extractAllClaims(token);
         return claimsResolver.apply(claims);
@@ -105,16 +98,16 @@ public class JwtTokenUtil {
     }
 
     public String getSubject(String token) {
-        return  extractClaim(token, Claims::getSubject);
+        return extractClaim(token, Claims::getSubject);
     }
 
 
     public boolean validateToken(String token, User userDetails) {
-        try{
+        try {
             String subject = extractClaim(token, Claims::getSubject);
             // subject is phoneNumber or email
             Token existingToken = tokenRepository.findByToken(token);
-            if(existingToken == null  || existingToken.isRevoked() == true || !userDetails.isActive()) {
+            if (existingToken == null || existingToken.isRevoked() == true || !userDetails.isActive()) {
                 return false;
             }
             return (subject.equals(userDetails.getUsername())) && !isTokenExpired(token);
@@ -129,10 +122,6 @@ public class JwtTokenUtil {
         }
         return false;
     }
-
-
-
-
 
 
 }
