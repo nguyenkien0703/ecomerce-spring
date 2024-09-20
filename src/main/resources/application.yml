@@ -36,6 +36,7 @@ jwt:
   expiration-refresh-token: 5184000 #60 days = 60 * 24 * 60 * 60
   secretKey: TaqlmGv1iEDMRiFp/pHuID1+T84IABfuA0xXh4GhiUI=
 
+#on prod, you must turn off
 logging:
   level:
     org:
@@ -48,3 +49,19 @@ springdoc:
   api-docs:
     path: /api-docs
   show-actuator: true
+
+
+
+
+#health check
+management:
+  endpoint:
+    health:
+
+      show-details: always
+  endpoints:
+    web:
+      base-path: /api/v1/actuator
+      exposure:
+        #include: "health"
+        include: "health, info"
