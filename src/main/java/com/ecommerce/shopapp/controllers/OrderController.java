@@ -6,7 +6,7 @@ import com.ecommerce.shopapp.entity.OrderStatus;
 import com.ecommerce.shopapp.entity.User;
 import com.ecommerce.shopapp.responses.OrderResponse;
 import com.ecommerce.shopapp.responses.ResponseObject;
-import com.ecommerce.shopapp.services.impl.OrderService;
+import com.ecommerce.shopapp.services.order.OrderService;
 import com.ecommerce.shopapp.utils.LocalizationUtils;
 import com.ecommerce.shopapp.utils.MessageKeys;
 import com.ecommerce.shopapp.utils.SecurityUtils;

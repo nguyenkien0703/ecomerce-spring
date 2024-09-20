@@ -1,10 +1,8 @@
-package com.ecommerce.shopapp.services;
+package com.ecommerce.shopapp.services.user;
 
-import com.ecommerce.shopapp.dtos.request.Login;
 import com.ecommerce.shopapp.dtos.request.UpdateUserDTO;
 import com.ecommerce.shopapp.dtos.request.UserDTO;
 import com.ecommerce.shopapp.dtos.request.UserLoginDTO;
-import com.ecommerce.shopapp.dtos.response.TokenResponse;
 import com.ecommerce.shopapp.entity.User;
 import com.ecommerce.shopapp.exception.DataNotFoundException;
 import com.ecommerce.shopapp.exception.InvalidPasswordException;

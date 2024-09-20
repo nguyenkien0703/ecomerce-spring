@@ -1,4 +1,4 @@
-package com.ecommerce.shopapp.services;
+package com.ecommerce.shopapp.services.product;
 
 import com.ecommerce.shopapp.dtos.request.ProductDTO;
 import com.ecommerce.shopapp.dtos.request.ProductImageDTO;

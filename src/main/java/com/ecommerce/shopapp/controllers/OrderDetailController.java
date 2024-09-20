@@ -4,7 +4,7 @@ import com.ecommerce.shopapp.dtos.request.OrderDetailDTO;
 import com.ecommerce.shopapp.entity.OrderDetail;
 import com.ecommerce.shopapp.exception.DataNotFoundException;
 import com.ecommerce.shopapp.responses.OrderDetailResponse;
-import com.ecommerce.shopapp.services.impl.OrderDetailService;
+import com.ecommerce.shopapp.services.orderdetail.OrderDetailService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

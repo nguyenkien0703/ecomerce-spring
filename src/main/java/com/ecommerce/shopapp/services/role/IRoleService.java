@@ -1,4 +1,4 @@
-package com.ecommerce.shopapp.services;
+package com.ecommerce.shopapp.services.role;
 
 
 import com.ecommerce.shopapp.entity.Role;

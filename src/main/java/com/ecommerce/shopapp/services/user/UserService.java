@@ -1,4 +1,4 @@
-package com.ecommerce.shopapp.services.impl;
+package com.ecommerce.shopapp.services.user;
 
 import com.ecommerce.shopapp.components.JwtTokenUtil;
 import com.ecommerce.shopapp.dtos.request.UpdateUserDTO;
@@ -14,7 +14,6 @@ import com.ecommerce.shopapp.exception.PermissionDenyException;
 import com.ecommerce.shopapp.repositories.RoleRepository;
 import com.ecommerce.shopapp.repositories.TokenRepository;
 import com.ecommerce.shopapp.repositories.UserRepository;
-import com.ecommerce.shopapp.services.IUserService;
 import com.ecommerce.shopapp.utils.LocalizationUtils;
 import com.ecommerce.shopapp.utils.MessageKeys;
 import jakarta.transaction.Transactional;
@@ -23,14 +22,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.ecommerce.shopapp.utils.ValidationUtils.isValidEmail;

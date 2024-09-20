@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 //Event-driven approach with Spring Data JPA
-//@EntityListeners(ProductListener.class)
+@EntityListeners(ProductListener.class)
 public class Product extends BaseEntity{
 
     @Id

@@ -1,9 +1,8 @@
-package com.ecommerce.shopapp.services;
+package com.ecommerce.shopapp.services.orderdetail;
 
 import com.ecommerce.shopapp.dtos.request.OrderDetailDTO;
 import com.ecommerce.shopapp.entity.OrderDetail;
 import com.ecommerce.shopapp.exception.DataNotFoundException;
-import com.ecommerce.shopapp.repositories.OrderDetailRepository;
 
 import java.util.List;
 public interface IOrderDetailService {

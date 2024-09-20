@@ -1,4 +1,4 @@
-package com.ecommerce.shopapp.services.impl;
+package com.ecommerce.shopapp.services.orderdetail;
 
 import com.ecommerce.shopapp.dtos.request.OrderDetailDTO;
 import com.ecommerce.shopapp.entity.Order;
@@ -8,7 +8,6 @@ import com.ecommerce.shopapp.exception.DataNotFoundException;
 import com.ecommerce.shopapp.repositories.OrderDetailRepository;
 import com.ecommerce.shopapp.repositories.OrderRepository;
 import com.ecommerce.shopapp.repositories.ProductRepository;
-import com.ecommerce.shopapp.services.IOrderDetailService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

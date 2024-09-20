@@ -1,4 +1,4 @@
-package com.ecommerce.shopapp.services;
+package com.ecommerce.shopapp.services.token;
 
 import com.ecommerce.shopapp.entity.Token;
 import com.ecommerce.shopapp.entity.User;

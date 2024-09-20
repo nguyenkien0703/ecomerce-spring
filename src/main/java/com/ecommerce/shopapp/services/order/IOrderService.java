@@ -1,4 +1,4 @@
-package com.ecommerce.shopapp.services;
+package com.ecommerce.shopapp.services.order;
 
 import com.ecommerce.shopapp.dtos.request.OrderDTO;
 import com.ecommerce.shopapp.entity.Order;

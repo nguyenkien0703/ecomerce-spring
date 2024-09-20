@@ -1,4 +1,4 @@
-package com.ecommerce.shopapp.services.impl;
+package com.ecommerce.shopapp.services.product;
 
 import com.ecommerce.shopapp.dtos.request.ProductDTO;
 import com.ecommerce.shopapp.dtos.request.ProductImageDTO;
@@ -11,7 +11,6 @@ import com.ecommerce.shopapp.repositories.CategoryRepository;
 import com.ecommerce.shopapp.repositories.ProductImageRepository;
 import com.ecommerce.shopapp.repositories.ProductRepository;
 import com.ecommerce.shopapp.responses.ProductResponse;
-import com.ecommerce.shopapp.services.IProductService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

@@ -1,4 +1,4 @@
-package com.ecommerce.shopapp.services.impl;
+package com.ecommerce.shopapp.services.token;
 
 import com.ecommerce.shopapp.components.JwtTokenUtil;
 import com.ecommerce.shopapp.entity.Token;
@@ -6,13 +6,11 @@ import com.ecommerce.shopapp.entity.User;
 import com.ecommerce.shopapp.exception.DataNotFoundException;
 import com.ecommerce.shopapp.exception.ExpiredTokenException;
 import com.ecommerce.shopapp.repositories.TokenRepository;
-import com.ecommerce.shopapp.services.ITokenService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;

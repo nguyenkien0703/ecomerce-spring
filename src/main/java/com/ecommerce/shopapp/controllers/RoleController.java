@@ -3,7 +3,7 @@ package com.ecommerce.shopapp.controllers;
 
 import com.ecommerce.shopapp.entity.Role;
 import com.ecommerce.shopapp.responses.ResponseObject;
-import com.ecommerce.shopapp.services.impl.RoleService;
+import com.ecommerce.shopapp.services.role.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

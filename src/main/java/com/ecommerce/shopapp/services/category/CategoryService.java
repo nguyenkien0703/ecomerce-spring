@@ -1,11 +1,10 @@
-package com.ecommerce.shopapp.services.impl;
+package com.ecommerce.shopapp.services.category;
 
 import com.ecommerce.shopapp.dtos.request.CategoryDTO;
 import com.ecommerce.shopapp.entity.Category;
 import com.ecommerce.shopapp.entity.Product;
 import com.ecommerce.shopapp.repositories.CategoryRepository;
 import com.ecommerce.shopapp.repositories.ProductRepository;
-import com.ecommerce.shopapp.services.ICategoryService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister;

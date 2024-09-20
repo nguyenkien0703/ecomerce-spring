@@ -8,7 +8,8 @@ import com.ecommerce.shopapp.exception.DataNotFoundException;
 import com.ecommerce.shopapp.responses.ProductListResponse;
 import com.ecommerce.shopapp.responses.ProductResponse;
 import com.ecommerce.shopapp.responses.ResponseObject;
-import com.ecommerce.shopapp.services.impl.ProductService;
+import com.ecommerce.shopapp.services.product.ProductRedisService;
+import com.ecommerce.shopapp.services.product.ProductService;
 import com.ecommerce.shopapp.utils.FileUtils;
 import com.ecommerce.shopapp.utils.LocalizationUtils;
 import com.ecommerce.shopapp.utils.MessageKeys;
@@ -45,7 +46,7 @@ import java.util.stream.Collectors;
 public class ProductController {
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
     private final LocalizationUtils localizationUtils;
-
+    private final ProductRedisService productRedisService;
     private final ProductService productService;
 
 
@@ -145,12 +146,31 @@ public class ProductController {
                 //Sort.by("createdAt").descending()
                 Sort.by("id").ascending());
         logger.info(String.format("keyword = %s, category_id = %d, page = %d, limit = %d", keyword, categoryId, page, limit));
-        Page<ProductResponse> productPage = productService
-                .getAllProducts(keyword, categoryId, pageRequest);
-        System.out.println(productPage);
-        // Lấy tổng số trang
-        totalPages = productPage.getTotalPages();
-        List<ProductResponse> productResponses = productPage.getContent();
+
+        List<ProductResponse> productResponses = productRedisService.getAllProducts(keyword, categoryId, pageRequest);
+        if(productResponses!= null && !productResponses.isEmpty()) {
+            totalPages = productResponses.get(0).getTotalPages();
+        }
+
+        if(productResponses == null){
+            Page<ProductResponse> productPage = productService
+                    .getAllProducts(keyword, categoryId, pageRequest);
+            // Lấy tổng số trang
+            totalPages = productPage.getTotalPages();
+            productResponses = productPage.getContent();
+            // Bổ sung totalPages vào các đối tượng ProductResponse
+            for (ProductResponse product : productResponses) {
+                product.setTotalPages(totalPages);
+            }
+            productRedisService.saveAllProducts(
+                    productResponses,
+                    keyword,
+                    categoryId,
+                    pageRequest
+            );
+
+        }
+
         ProductListResponse productListResponse = ProductListResponse
                 .builder()
                 .products(productResponses)

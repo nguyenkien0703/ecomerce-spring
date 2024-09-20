@@ -1,8 +1,7 @@
-package com.ecommerce.shopapp.services.impl;
+package com.ecommerce.shopapp.services.role;
 
 import com.ecommerce.shopapp.entity.Role;
 import com.ecommerce.shopapp.repositories.RoleRepository;
-import com.ecommerce.shopapp.services.IRoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

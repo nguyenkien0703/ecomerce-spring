@@ -1,4 +1,4 @@
-package com.ecommerce.shopapp.services;
+package com.ecommerce.shopapp.services.category;
 
 import com.ecommerce.shopapp.dtos.request.CategoryDTO;
 import com.ecommerce.shopapp.entity.Category;
