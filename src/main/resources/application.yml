@@ -25,10 +25,15 @@ spring:
   #flyway
   # Đường dẫn tới thư mục chứa các script Flyway
   flyway:
-    locations: classpath:/db/migration,classpath:/dev/db/migration
+    locations: classpath:db/migration,classpath:dev/db/migration
     #Phiên bản baseline sẽ = 1 và không thực hiện bất kỳ thay đổi nào trong DB
     baseline-on-migrate: true
     baseline-version: 0
+    enabled: true
+    sql-migration-prefix: V
+    sql-migration-suffixes: .sql
+    sql-migration-separator: __
+    repeatable-sql-migration-prefix: R
   data:
     redis:
       #spring.data.redis.use-redis-cache
