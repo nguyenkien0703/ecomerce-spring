@@ -6,6 +6,8 @@ import com.ecommerce.shopapp.dtos.request.UserDTO;
 import com.ecommerce.shopapp.dtos.request.UserLoginDTO;
 import com.ecommerce.shopapp.entity.Token;
 import com.ecommerce.shopapp.entity.User;
+import com.ecommerce.shopapp.exception.DataNotFoundException;
+import com.ecommerce.shopapp.exception.InvalidPasswordException;
 import com.ecommerce.shopapp.responses.LoginResponse;
 import com.ecommerce.shopapp.responses.ResponseObject;
 import com.ecommerce.shopapp.responses.UserResponse;
@@ -28,6 +30,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("${api.prefix}/users")
@@ -171,6 +174,36 @@ public class UserController {
                         .build()
         );
     }
+
+
+    @PutMapping("/reset-password/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<ResponseObject> resetPassword(@Valid @PathVariable long userId){
+        try {
+            String newPassword = UUID.randomUUID().toString().substring(0, 5); // Tạo mật khẩu mới
+            userService.resetPassword(userId, newPassword);
+            return ResponseEntity.ok(ResponseObject.builder()
+                    .message("Reset password successfully")
+                    .data(newPassword)
+                    .status(HttpStatus.OK)
+                    .build());
+        } catch (InvalidPasswordException e) {
+            return ResponseEntity.ok(ResponseObject.builder()
+                    .message("Invalid password")
+                    .data("")
+                    .status(HttpStatus.BAD_REQUEST)
+                    .build());
+        } catch (DataNotFoundException e) {
+            return ResponseEntity.ok(ResponseObject.builder()
+                    .message("User not found")
+                    .data("")
+                    .status(HttpStatus.BAD_REQUEST)
+                    .build());
+        }
+
+
+    }
+
 
 
 }
