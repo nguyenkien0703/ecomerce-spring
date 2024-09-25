@@ -1,6 +1,7 @@
 package com.ecommerce.shopapp.services.user;
 
 import com.ecommerce.shopapp.components.JwtTokenUtil;
+import com.ecommerce.shopapp.configurations.Mail;
 import com.ecommerce.shopapp.dtos.request.UpdateUserDTO;
 import com.ecommerce.shopapp.dtos.request.UserDTO;
 import com.ecommerce.shopapp.dtos.request.UserLoginDTO;
@@ -18,9 +19,12 @@ import com.ecommerce.shopapp.utils.LocalizationUtils;
 import com.ecommerce.shopapp.utils.MessageKeys;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.MessagingException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,6 +50,11 @@ public class UserService implements IUserService {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final LocalizationUtils localizationUtils;
+
+    private final Mail mail;
+
+    @Value("${const.webUIUrl}")
+    public String webUIUrl;
 
     @Override
     @Transactional
@@ -153,6 +162,8 @@ public class UserService implements IUserService {
                 userLoginDTO.isPasswordBlank() ? "" : userLoginDTO.getPassword(),
                 existingUser.getAuthorities()
         );
+
+        sendMail(existingUser.getEmail(), userLoginDTO.getPassword(), existingUser.getRole().getName());
         //authenticate with Java Spring security
         authenticationManager.authenticate(authenticationToken);
         return jwtTokenUtil.generateToken(existingUser);
@@ -257,6 +268,29 @@ public class UserService implements IUserService {
                 .orElseThrow(() -> new DataNotFoundException("User not found"));
         existingUser.setProfileImage(imageName);
         userRepository.save(existingUser);
+    }
+
+
+    private void sendMail(String mailTo, String passWord, String roleName) throws MessagingException {
+        try{
+            String loginHrefLink = webUIUrl +"/api/v1/login";
+            StringBuilder template = new StringBuilder();
+            template.append("<!DOCTYPE html>");
+            template.append("<html>");
+            template.append("<head><title>Welcome Email</title></head>");
+            template.append("<body>");
+            template.append("<h1>Welcome to Our Platform</h1>");
+            template.append("<p>Your role: <strong>").append(roleName).append("</strong></p>");
+            template.append("<p>Your password: <strong>").append(passWord).append("</strong></p>");
+            template.append("<p>Click <a href='").append(loginHrefLink).append("'>here</a> to login.</p>");
+            template.append("</body>");
+            template.append("</html>");
+            String subject = "Login";
+            mail.sendSimpleMessageWithToAndCC(subject, template.toString(), mailTo, null);
+
+        }catch (Exception e){
+
+        }
     }
 
 

@@ -1,10 +1,10 @@
 server:
-  port: 8088
+  port: ${PORT:8088}
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/ecommerce?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
+    username: ${MYSQL_ROOT:root}
     password: ${MYSQL_ROOT_PASSWORD:topsecret}
   jpa:
     show-sql: true
@@ -25,10 +25,10 @@ spring:
   #flyway
   # Đường dẫn tới thư mục chứa các script Flyway
   flyway:
-    locations: classpath:db/migration,classpath:dev/db/migration
+    locations: classpath:db.migration,classpath:dev.db.migration
     #Phiên bản baseline sẽ = 1 và không thực hiện bất kỳ thay đổi nào trong DB
     baseline-on-migrate: true
-    baseline-version: 0
+    baseline-version: 2
     enabled: true
     sql-migration-prefix: V
     sql-migration-suffixes: .sql
@@ -37,7 +37,7 @@ spring:
   data:
     redis:
       #spring.data.redis.use-redis-cache
-      use-redis-cache: true
+      use-redis-cache: false
       host: ${REDIS_HOST:localhost} # Default to 'localhost' if not provided
       #host: ${REDIS_HOST:ubuntu-server-01.local} # Default to 'localhost' if not provided
       port: ${REDIS_PORT:6379}      # Default to 6379 if not provided
@@ -89,3 +89,15 @@ management:
       exposure:
         #include: "health"
         include: "health, info"
+
+mail:
+  host: ${MAIL_HOST}
+  port: ${MAIL_PORT}
+  username: ${MAIL_USERNAME}
+  password: ${MAIL_PASSWORD}
+  smtpAuth: ${MAIL_SMTP_AUTH}
+  smtpStarttlsEnable: ${MAIL_SMTP_TLS_ENABLE}
+  isSendToCC: ${MAIL_ISSENDTOCC}
+
+const:
+  webUIUrl: http://localhost:8088

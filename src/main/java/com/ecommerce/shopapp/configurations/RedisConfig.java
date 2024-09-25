@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +28,13 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}") // Read 'spring.data.redis.port' property from application.yml
     private int redisPort;
 
+//    private final LettuceConnectionFactory connectionFactory;
+//
+//
+//
+//    public RedisConfig() {
+//        this.connectionFactory = redisConnectionFactory();
+//    }
 
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
@@ -61,5 +69,11 @@ public class RedisConfig {
         objectMapper.registerModule(module);
         return objectMapper;
     }
+
+
+//    @PreDestroy
+//    public void cleanup() {
+//        connectionFactory.destroy();
+//    }
 
 }
