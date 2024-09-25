@@ -1,6 +1,7 @@
 package com.ecommerce.shopapp.controllers;
 
 import com.ecommerce.shopapp.dtos.request.RefreshTokenDTO;
+import com.ecommerce.shopapp.dtos.request.UpdateUserDTO;
 import com.ecommerce.shopapp.dtos.request.UserDTO;
 import com.ecommerce.shopapp.dtos.request.UserLoginDTO;
 import com.ecommerce.shopapp.entity.Token;
@@ -13,6 +14,8 @@ import com.ecommerce.shopapp.services.user.UserService;
 import com.ecommerce.shopapp.utils.LocalizationUtils;
 import com.ecommerce.shopapp.utils.MessageKeys;
 import com.ecommerce.shopapp.utils.ValidationUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -142,7 +145,32 @@ public class UserController {
     }
 
 
+    @PutMapping("/details/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public ResponseEntity<ResponseObject> updateUserDetails(
+            @PathVariable Long userId,
+            @RequestBody UpdateUserDTO updatedUserDTO,
+            @RequestHeader("Authorization") String authorizationHeader
+    ) throws Exception{
+        String extractedToken = authorizationHeader.substring(7);
+        User user = userService.getUserDetailsFromToken(extractedToken);
+        // Ensure that the user making the request matches the user being updated
+        if (user.getId() != userId) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
+
+        User updatedUser = userService.updateUser(userId, updatedUserDTO);
+
+        return ResponseEntity.ok().body(
+                ResponseObject.builder()
+                        .message("Update user detail successfully")
+                        .data(UserResponse.fromUser(updatedUser))
+                        .status(HttpStatus.OK)
+                        .build()
+        );
+    }
 
 
 }
