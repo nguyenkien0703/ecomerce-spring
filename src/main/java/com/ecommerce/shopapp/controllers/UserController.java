@@ -204,6 +204,21 @@ public class UserController {
 
     }
 
+    @PutMapping("/block/{userId}/{active}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<ResponseObject> blockOrEnable(
+            @Valid @PathVariable long userId,
+            @Valid @PathVariable int active
+    ) throws Exception {
+        userService.blockOrEnable(userId, active > 0);
+        String message = active > 0 ? "Successfully enabled the user." : "Successfully blocked the user.";
+        return ResponseEntity.ok().body(ResponseObject.builder()
+                .message(message)
+                .status(HttpStatus.OK)
+                .data(null)
+                .build());
+    }
+
 
 
 }
