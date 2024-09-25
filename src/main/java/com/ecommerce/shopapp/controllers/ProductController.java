@@ -15,6 +15,8 @@ import com.ecommerce.shopapp.utils.LocalizationUtils;
 import com.ecommerce.shopapp.utils.MessageKeys;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.javafaker.Faker;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -214,7 +216,7 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-//    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<ResponseObject> deleteProduct(@PathVariable long id) {
 
 
@@ -246,6 +248,7 @@ public class ProductController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     //@SecurityRequirement(name="bearer-key")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<ResponseObject> updateProduct(
             @PathVariable long id,
             @RequestBody ProductDTO productDTO
